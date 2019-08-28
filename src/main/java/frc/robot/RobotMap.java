@@ -47,6 +47,10 @@ public class RobotMap {
         public static final double MIN_CORRECTION_FACTOR = 0;
         public static final double MAX_CORRECTION_FACTOR = 1;
         public static final double CORRECTION_FACTOR = (MAX_CORRECTION_FACTOR - MIN_CORRECTION_FACTOR) / (45 - PITCH_THRESHOLD_DEGREES);
+
+        public static final double KP = 0;
+        public static final double KI = 0;
+        public static final double KD = 0;
     }
 
     public class CLIMBER {
