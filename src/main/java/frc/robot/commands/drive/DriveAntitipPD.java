@@ -2,7 +2,7 @@ package frc.robot.commands.drive;
 
 import edu.wpi.first.networktables.NetworkTable;
 import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.PIDController;
+import edu.wpi.first.wpilibj.Timer;
 import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.OI;
 import frc.robot.RobotMap;
@@ -20,10 +20,21 @@ public class DriveAntitipPD extends Command {
 
     private double pitchDegrees;
 
-    private SynchronousPIDF pidController;
+    private SynchronousPIDF m_pidController;
+
+    private Timer m_timer;
+    private double m_lastTime = 0;
 
     public DriveAntitipPD() {
         requires(Drivetrain.getInstance());
+
+        this.m_timer = new Timer();
+
+        m_pidController = new SynchronousPIDF(RobotMap.DRIVE.KP, RobotMap.DRIVE.KI, RobotMap.DRIVE.KD);
+        m_pidController.setSetpoint(0);
+        m_pidController.setInputRange(0, 360);
+        m_pidController.setContinuous(true);
+        m_pidController.setOutputRange(-1, 1);
     }
 
     private static double powerCurve(double x) {
@@ -80,6 +91,7 @@ public class DriveAntitipPD extends Command {
     @Override
     protected void initialize() {
         setCamera("RPI");
+        this.m_timer.start();
     }
 
     @Override
@@ -87,13 +99,18 @@ public class DriveAntitipPD extends Command {
         double leftRaw = OI.getInstance().lowPower() ? OI.getInstance().getLeftY() / 2.0 : OI.getInstance().getLeftY();
         double rightRaw = OI.getInstance().lowPower() ? OI.getInstance().getRightY() / 2.0 : OI.getInstance().getRightY();
         double[] stickSpeeds = {powerCurve(leftRaw), powerCurve(rightRaw)};
+        double correction = 0;
+
 
         if (!Drivetrain.getInstance().getIsAntiTipDisabled()) {
             updatePitchStatus();
             if (Math.abs(pitchDegrees) > RobotMap.DRIVE.PITCH_THRESHOLD_DEGREES) {
-                this.correctForPitch(stickSpeeds);
+                //this.correctForPitch(stickSpeeds);
+                correction = this.m_pidController.calculate(pitchDegrees, this.m_timer.get() - this.m_lastTime);
             }
         }
+
+
         if (!sideFlipped) {
             Drivetrain.getInstance().tankDrive(stickSpeeds[0], stickSpeeds[1]);
         } else {
@@ -111,6 +128,7 @@ public class DriveAntitipPD extends Command {
             }
         }
 
+        this.m_lastTime = this.m_timer.get();
     }
 
     @Override
