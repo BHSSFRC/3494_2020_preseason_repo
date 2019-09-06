@@ -18,6 +18,7 @@ import frc.robot.commands.climb.RunWinches;
 import frc.robot.commands.climb.feet.SetFrontFeet;
 import frc.robot.commands.climb.feet.ToggleFrontFeet;
 import frc.robot.commands.climb.feet.ToggleRearFeet;
+import frc.robot.commands.drive.DriveStraight;
 import frc.robot.commands.spade.EjectHatch;
 import frc.robot.subsystems.Climber;
 import frc.robot.subsystems.Drivetrain;
@@ -46,6 +47,7 @@ public class OI {
     private JoystickButton autoPark;
 
     private JoystickButton toggleAntiTip;
+    private JoystickButton driveStraight;
     private static HashMap<Integer, Double> armPositions = new HashMap<>();
 
     private OI() {
@@ -69,6 +71,7 @@ public class OI {
         winchClimber = new JoystickButton(bb, RobotMap.OI.WINCH_CLIMBER);
         winchReverse = new JoystickButton(bb, RobotMap.OI.WINCH_REVERSE);
         toggleAntiTip = new JoystickButton(bb, RobotMap.OI.TOGGLE_ANTI_TIP);
+        driveStraight = new JoystickButton(bb, RobotMap.OI.DRIVE_STRAIGHT);
         autoPark = new JoystickButton(bb, RobotMap.OI.AUTOMATIC_PARK);
 
         secondLevel.whenPressed(new SetFrontFeet(DoubleSolenoid.Value.kReverse));
@@ -88,6 +91,10 @@ public class OI {
 
         toggleAntiTip.whenPressed(new InstantCommand(Drivetrain.getInstance(), () -> Drivetrain.getInstance().toggleAntiTip()));
         boardButtons[RobotMap.OI.TOGGLE_ANTI_TIP] = toggleAntiTip;
+
+        driveStraight.whenPressed(new DriveStraight());
+        //TODO: does driveStraight.whenReleased() need to trigger the normal drive command?
+        boardButtons[RobotMap.OI.DRIVE_STRAIGHT] = driveStraight;
 
         winchClimber.whenPressed(new RunWinches(RobotMap.CLIMBER.WINCH_POWER));
         winchClimber.whenReleased(new RunWinches(0));

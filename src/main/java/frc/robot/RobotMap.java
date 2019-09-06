@@ -114,6 +114,8 @@ public class RobotMap {
         public static final int AUTOMATIC_PARK = 9;
 
         public static final int TOGGLE_ANTI_TIP = 13;
+
+        public static final int DRIVE_STRAIGHT = 15;
     }
 
     public static final int PRESSURE_SENSOR_PORT = 0;
