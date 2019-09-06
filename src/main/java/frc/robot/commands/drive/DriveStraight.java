@@ -40,12 +40,6 @@ public class DriveStraight extends Command {
         this.m_timer = new Timer();
     }
 
-    private static double powerCurve(double x) {
-        // https://www.desmos.com/calculator/g07ukjj7bl
-        double curve = (0.5D * (Math.atan(Math.PI * (Math.abs(x) - 0.5D)))) + 0.5D;
-        return Math.copySign(curve, x);
-    }
-
     /**
      * @param motorSpeeds array of motor power values
      *                    If any of the values are more than 1, they aren't valid values for motor power.
@@ -83,9 +77,8 @@ public class DriveStraight extends Command {
 
     @Override
     protected void execute() {
-        double leftRaw = OI.getInstance().lowPower() ? OI.getInstance().getLeftY() / 2.0 : OI.getInstance().getLeftY();
-        double rightRaw = OI.getInstance().lowPower() ? OI.getInstance().getRightY() / 2.0 : OI.getInstance().getRightY();
-        double[] stickSpeeds = {powerCurve(leftRaw), powerCurve(rightRaw)};
+        //TODO: speeds should just be some constant
+        double[] stickSpeeds = {RobotMap.DRIVE.DRIVE_STRAIGHT_POWER, RobotMap.DRIVE.DRIVE_STRAIGHT_POWER};
         this.updateYawStatus();
         double correctionAmount = 0;
 
