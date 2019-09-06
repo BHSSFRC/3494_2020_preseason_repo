@@ -10,7 +10,7 @@ import frc.robot.sensors.NavX;
 import frc.robot.subsystems.Drivetrain;
 import frc.robot.util.SynchronousPIDF;
 
-public class DriveAntitipPD extends Command {
+public class DriveStraight extends Command {
 
     /**
      * Indicator of which side of the robot is the "front" for operator driving. Set to true iff the driver has
@@ -18,24 +18,23 @@ public class DriveAntitipPD extends Command {
      */
     private boolean sideFlipped = false;
 
-    private double pitchDegrees;
+    private double yawDegrees;
 
-    private SynchronousPIDF m_pidController;
+    private SynchronousPIDF pidController;
 
     private Timer m_timer;
-    private double m_lastTime = 0;
 
-    public DriveAntitipPD() {
+    public DriveStraight() {
         requires(Drivetrain.getInstance());
 
-        this.m_timer = new Timer();
+        pidController = new SynchronousPIDF(RobotMap.DRIVE.KP, RobotMap.DRIVE.KI, RobotMap.DRIVE.KD);
+        pidController.setSetpoint(0);
+        //input range isn't 0 to 360 because negative yaw angles from the gyro exist?
+        pidController.setInputRange(-180, 180);
+        pidController.setContinuous(true);
+        pidController.setOutputRange(-1, 1);
 
-        m_pidController = new SynchronousPIDF(RobotMap.DRIVE.KP, RobotMap.DRIVE.KI, RobotMap.DRIVE.KD);
-        m_pidController.setSetpoint(0);
-        //input range isn't 0 to 360 because negative pitch angles from the gyro exist
-        m_pidController.setInputRange(-180, 180);
-        m_pidController.setContinuous(true);
-        m_pidController.setOutputRange(-1, 1);
+        this.m_timer = new Timer();
     }
 
     private static double powerCurve(double x) {
@@ -67,32 +66,15 @@ public class DriveAntitipPD extends Command {
         }
     }
 
-    private void correctForPitch(double[] stickSpeeds) {//x-tip
-        //if its over 45 there's no point in correcting it
-        if (Math.abs(pitchDegrees) < 45) {
-            //correctionFactor keeps the tilt correction within a certain threshold so it doesn't correct too much
 
-            double correctionOffset = RobotMap.DRIVE.CORRECTION_FACTOR * (pitchDegrees - RobotMap.DRIVE.PITCH_THRESHOLD_DEGREES);
-            //double correctionOffset = this.pitchDegrees / 10;
-            if (Math.abs(pitchDegrees) < RobotMap.DRIVE.PITCH_ALARM_THRESHOLD) {
-                stickSpeeds[0] += correctionOffset;
-                stickSpeeds[1] += correctionOffset;
-            } else {
-                stickSpeeds[0] = correctionOffset;
-                stickSpeeds[1] = correctionOffset;
-            }
-            normalize(stickSpeeds);
-        }
-    }
 
-    private void updatePitchStatus() {
-        this.pitchDegrees = NavX.getInstance().getPitchDegrees();
+    private void updateYawStatus() {
+        this.yawDegrees = NavX.getInstance().getYawDegrees();
     }
 
     @Override
     protected void initialize() {
         setCamera("RPI");
-        this.m_timer.start();
     }
 
     @Override
@@ -100,19 +82,7 @@ public class DriveAntitipPD extends Command {
         double leftRaw = OI.getInstance().lowPower() ? OI.getInstance().getLeftY() / 2.0 : OI.getInstance().getLeftY();
         double rightRaw = OI.getInstance().lowPower() ? OI.getInstance().getRightY() / 2.0 : OI.getInstance().getRightY();
         double[] stickSpeeds = {powerCurve(leftRaw), powerCurve(rightRaw)};
-        double correction = 0;
 
-
-        if (!Drivetrain.getInstance().getIsAntiTipDisabled()) {
-            updatePitchStatus();
-            if (Math.abs(pitchDegrees) > RobotMap.DRIVE.PITCH_THRESHOLD_DEGREES) {
-                //this.correctForPitch(stickSpeeds);
-                correction = this.m_pidController.calculate(pitchDegrees, this.m_timer.get() - this.m_lastTime);
-                double correctionAmount = correction * (RobotMap.DRIVE.PID_CORRECTION_FACTOR - RobotMap.DRIVE.PITCH_THRESHOLD_DEGREES);
-                stickSpeeds[0] += correctionAmount;
-                stickSpeeds[1] += correctionAmount;
-            }
-        }
 
 
         if (!sideFlipped) {
@@ -132,7 +102,6 @@ public class DriveAntitipPD extends Command {
             }
         }
 
-        this.m_lastTime = this.m_timer.get();
     }
 
     @Override

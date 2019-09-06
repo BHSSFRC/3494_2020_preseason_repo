@@ -9,11 +9,13 @@ public class NavX {
     private AHRS ahrs;
     private double resetValue;
     private double resetPitchValue;
+    private double resetYawValue;
 
     private NavX() {
         this.ahrs = new AHRS(SPI.Port.kMXP);
         this.resetFusedHeading();
         this.resetPitch();
+        this.resetYaw();
     }
 
     public static NavX getInstance() {
@@ -22,6 +24,9 @@ public class NavX {
 
     public void resetPitch() {
         this.resetPitchValue = -this.ahrs.getPitch();
+    }
+    public void resetYaw() {
+        this.resetYawValue = this.ahrs.getYaw();
     }
 
     public double getFusedHeading() {
@@ -39,6 +44,11 @@ public class NavX {
     public double getPitchDegrees() {
         double pitchDegrees = -this.ahrs.getPitch() - resetPitchValue;
         return pitchDegrees;
+    }
+
+    public double getYawDegrees() {
+        double yawDegrees = this.ahrs.getYaw() - resetYawValue;
+        return yawDegrees;
     }
 
     public double getRollDegrees() {
