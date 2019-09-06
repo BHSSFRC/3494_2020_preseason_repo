@@ -81,6 +81,8 @@ public class DriveAntitipPD extends Command {
                 stickSpeeds[0] = correctionOffset;
                 stickSpeeds[1] = correctionOffset;
             }
+            //TODO: does this actually work considering that normalize() doesn't return anything? If it does work
+            //then revert DriveStraight to return void
             normalize(stickSpeeds);
         }
     }
@@ -108,7 +110,7 @@ public class DriveAntitipPD extends Command {
             if (Math.abs(pitchDegrees) > RobotMap.DRIVE.PITCH_THRESHOLD_DEGREES) {
                 //this.correctForPitch(stickSpeeds);
                 correction = this.m_pidController.calculate(pitchDegrees, this.m_timer.get() - this.m_lastTime);
-                double correctionAmount = correction * (RobotMap.DRIVE.PID_CORRECTION_FACTOR - RobotMap.DRIVE.PITCH_THRESHOLD_DEGREES);
+                double correctionAmount = correction * RobotMap.DRIVE.PID_PITCH_CORRECTION_FACTOR;
                 stickSpeeds[0] += correctionAmount;
                 stickSpeeds[1] += correctionAmount;
             }

@@ -23,12 +23,15 @@ public class DriveStraight extends Command {
     private SynchronousPIDF pidController;
 
     private Timer m_timer;
+    private double lastTime;
 
     public DriveStraight() {
         requires(Drivetrain.getInstance());
 
+        //takes same PID constants as DriveAntitipPD does. if necessary will add new set of constants
         pidController = new SynchronousPIDF(RobotMap.DRIVE.KP, RobotMap.DRIVE.KI, RobotMap.DRIVE.KD);
         pidController.setSetpoint(0);
+
         //input range isn't 0 to 360 because negative yaw angles from the gyro exist?
         pidController.setInputRange(-180, 180);
         pidController.setContinuous(true);
@@ -48,7 +51,7 @@ public class DriveStraight extends Command {
      *                    If any of the values are more than 1, they aren't valid values for motor power.
      *                    If so, it divides all array values by the largest value to preserve the value ratios while making them valid motor power values.
      */
-    private void normalize(double[] motorSpeeds) {
+    private double[] normalize(double[] motorSpeeds) {
         double max = Math.abs(motorSpeeds[0]);
         boolean normFlag = max > 1;
 
@@ -64,6 +67,7 @@ public class DriveStraight extends Command {
                 motorSpeeds[i] /= max;
             }
         }
+        return motorSpeeds;
     }
 
 
@@ -82,7 +86,15 @@ public class DriveStraight extends Command {
         double leftRaw = OI.getInstance().lowPower() ? OI.getInstance().getLeftY() / 2.0 : OI.getInstance().getLeftY();
         double rightRaw = OI.getInstance().lowPower() ? OI.getInstance().getRightY() / 2.0 : OI.getInstance().getRightY();
         double[] stickSpeeds = {powerCurve(leftRaw), powerCurve(rightRaw)};
+        this.updateYawStatus();
+        double correctionAmount = 0;
 
+        double pidOutput = this.pidController.calculate(yawDegrees, this.m_timer.get() - this.lastTime);
+        correctionAmount = pidOutput * RobotMap.DRIVE.PID_YAW_CORRECTION_FACTOR;
+
+        stickSpeeds[0] += correctionAmount;
+        stickSpeeds[1] -= correctionAmount;
+        stickSpeeds = this.normalize(stickSpeeds);
 
 
         if (!sideFlipped) {
@@ -101,7 +113,7 @@ public class DriveStraight extends Command {
                 setCamera("USB");
             }
         }
-
+        this.lastTime = this.m_timer.get();
     }
 
     @Override
