@@ -114,7 +114,7 @@ public class Drive extends Command {
         return false;
     }
 
-    private static boolean setCamera(String camera) {
+    protected static boolean setCamera(String camera) {
         NetworkTable engineering = NetworkTableInstance.getDefault().getTable("engineering");
         return engineering.getEntry("camera").setString(camera);
     }
