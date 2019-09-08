@@ -24,7 +24,7 @@ public class DriveStraight extends Drive {
 
         //takes same PID constants as DriveAntitipPD does. if necessary will add new set of constants
         pidController = new SynchronousPIDF(RobotMap.DRIVE.KP, RobotMap.DRIVE.KI, RobotMap.DRIVE.KD);
-        pidController.setSetpoint(0);
+        pidController.setSetpoint(NavX.getInstance().getFusedHeading());
 
         pidController.setInputRange(0, 2 * Math.PI);
         pidController.setContinuous(true);
@@ -37,7 +37,6 @@ public class DriveStraight extends Drive {
     @Override
     protected void execute() {
         double[] stickSpeeds = {RobotMap.DRIVE.DRIVE_STRAIGHT_POWER, RobotMap.DRIVE.DRIVE_STRAIGHT_POWER};
-        this.updateFusedHeading();
         double correctionAmount = 0;
 
         double pidOutput = this.pidController.calculate(NavX.getInstance().getFusedHeading(), this.m_timer.delta());
