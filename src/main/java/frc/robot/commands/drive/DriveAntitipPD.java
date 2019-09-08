@@ -73,7 +73,7 @@ public class DriveAntitipPD extends Command {
         if (Math.abs(pitchDegrees) < 45) {
             //correctionFactor keeps the tilt correction within a certain threshold so it doesn't correct too much
 
-            double correctionOffset = RobotMap.DRIVE.CORRECTION_FACTOR * (pitchDegrees - RobotMap.DRIVE.PITCH_THRESHOLD_DEGREES);
+            double correctionOffset = pitchDegrees - RobotMap.DRIVE.PITCH_THRESHOLD_DEGREES;
             //double correctionOffset = this.pitchDegrees / 10;
             if (Math.abs(pitchDegrees) < RobotMap.DRIVE.PITCH_ALARM_THRESHOLD) {
                 stickSpeeds[0] += correctionOffset;

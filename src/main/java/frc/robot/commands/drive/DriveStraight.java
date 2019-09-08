@@ -48,10 +48,9 @@ public class DriveStraight extends Drive {
         double correctionAmount = 0;
 
         double pidOutput = this.pidController.calculate(fusedHeadingRadians, this.m_timer.delta());
-        correctionAmount = pidOutput * RobotMap.DRIVE.PID_FUSED_HEADING_CORRECTION_FACTOR;
 
-        stickSpeeds[0] += correctionAmount;
-        stickSpeeds[1] -= correctionAmount;
+        stickSpeeds[0] += pidOutput;
+        stickSpeeds[1] -= pidOutput;
         stickSpeeds = this.normalize(stickSpeeds);
 
 
