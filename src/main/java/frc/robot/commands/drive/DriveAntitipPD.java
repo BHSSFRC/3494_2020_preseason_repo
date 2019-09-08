@@ -8,6 +8,7 @@ import frc.robot.OI;
 import frc.robot.RobotMap;
 import frc.robot.sensors.NavX;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.util.QuadTimer;
 import frc.robot.util.SynchronousPIDF;
 
 public class DriveAntitipPD extends Command {
@@ -22,13 +23,13 @@ public class DriveAntitipPD extends Command {
 
     private SynchronousPIDF m_pidController;
 
-    private Timer m_timer;
+    private QuadTimer m_timer;
     private double m_lastTime = 0;
 
     public DriveAntitipPD() {
         requires(Drivetrain.getInstance());
 
-        this.m_timer = new Timer();
+        this.m_timer = new QuadTimer();
 
         m_pidController = new SynchronousPIDF(RobotMap.DRIVE.KP, RobotMap.DRIVE.KI, RobotMap.DRIVE.KD);
         m_pidController.setSetpoint(0);

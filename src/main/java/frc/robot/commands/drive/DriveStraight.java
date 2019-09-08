@@ -8,9 +8,10 @@ import frc.robot.OI;
 import frc.robot.RobotMap;
 import frc.robot.sensors.NavX;
 import frc.robot.subsystems.Drivetrain;
+import frc.robot.util.QuadTimer;
 import frc.robot.util.SynchronousPIDF;
 
-public class DriveStraight extends Command {
+public class DriveStraight extends Drive {
 
     /**
      * Indicator of which side of the robot is the "front" for operator driving. Set to true iff the driver has
@@ -22,7 +23,7 @@ public class DriveStraight extends Command {
 
     private SynchronousPIDF pidController;
 
-    private Timer m_timer;
+    private QuadTimer m_timer;
     private double lastTime;
 
     public DriveStraight() {
@@ -32,48 +33,18 @@ public class DriveStraight extends Command {
         pidController = new SynchronousPIDF(RobotMap.DRIVE.KP, RobotMap.DRIVE.KI, RobotMap.DRIVE.KD);
         pidController.setSetpoint(0);
 
-        //input range isn't 0 to 360 because negative yaw angles from the gyro exist?
         pidController.setInputRange(-180, 180);
         pidController.setContinuous(true);
         pidController.setOutputRange(-1, 1);
 
-        this.m_timer = new Timer();
+        this.m_timer = new QuadTimer();
     }
-
-    /**
-     * @param motorSpeeds array of motor power values
-     *                    If any of the values are more than 1, they aren't valid values for motor power.
-     *                    If so, it divides all array values by the largest value to preserve the value ratios while making them valid motor power values.
-     */
-    private double[] normalize(double[] motorSpeeds) {
-        double max = Math.abs(motorSpeeds[0]);
-        boolean normFlag = max > 1;
-
-        for (int i = 1; i < motorSpeeds.length; i++) {
-            if (Math.abs(motorSpeeds[i]) > max) {
-                max = Math.abs(motorSpeeds[i]);
-                normFlag = max > 1;
-            }
-        }
-
-        if (normFlag) {
-            for (int i = 0; i < motorSpeeds.length; i++) {
-                motorSpeeds[i] /= max;
-            }
-        }
-        return motorSpeeds;
-    }
-
 
 
     private void updateYawStatus() {
         this.yawDegrees = NavX.getInstance().getYawDegrees();
     }
 
-    @Override
-    protected void initialize() {
-        setCamera("RPI");
-    }
 
     @Override
     protected void execute() {
@@ -106,15 +77,5 @@ public class DriveStraight extends Command {
             }
         }
         this.lastTime = this.m_timer.get();
-    }
-
-    @Override
-    protected boolean isFinished() {
-        return false;
-    }
-
-    private static boolean setCamera(String camera) {
-        NetworkTable engineering = NetworkTableInstance.getDefault().getTable("engineering");
-        return engineering.getEntry("camera").setString(camera);
     }
 }
