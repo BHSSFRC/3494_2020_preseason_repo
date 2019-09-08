@@ -24,7 +24,6 @@ public class DriveAntitipPD extends Command {
     private SynchronousPIDF m_pidController;
 
     private QuadTimer m_timer;
-    private double m_lastTime = 0;
 
     public DriveAntitipPD() {
         requires(Drivetrain.getInstance());
@@ -68,25 +67,6 @@ public class DriveAntitipPD extends Command {
         }
     }
 
-    private void correctForPitch(double[] stickSpeeds) {//x-tip
-        //if its over 45 there's no point in correcting it
-        if (Math.abs(pitchDegrees) < 45) {
-            //correctionFactor keeps the tilt correction within a certain threshold so it doesn't correct too much
-
-            double correctionOffset = pitchDegrees - RobotMap.DRIVE.PITCH_THRESHOLD_DEGREES;
-            //double correctionOffset = this.pitchDegrees / 10;
-            if (Math.abs(pitchDegrees) < RobotMap.DRIVE.PITCH_ALARM_THRESHOLD) {
-                stickSpeeds[0] += correctionOffset;
-                stickSpeeds[1] += correctionOffset;
-            } else {
-                stickSpeeds[0] = correctionOffset;
-                stickSpeeds[1] = correctionOffset;
-            }
-            //TODO: does this actually work considering that normalize() doesn't return anything? If it does work then revert DriveStraight to return void
-            normalize(stickSpeeds);
-        }
-    }
-
     private void updatePitchStatus() {
         this.pitchDegrees = NavX.getInstance().getPitchDegrees();
     }
@@ -102,17 +82,14 @@ public class DriveAntitipPD extends Command {
         double leftRaw = OI.getInstance().lowPower() ? OI.getInstance().getLeftY() / 2.0 : OI.getInstance().getLeftY();
         double rightRaw = OI.getInstance().lowPower() ? OI.getInstance().getRightY() / 2.0 : OI.getInstance().getRightY();
         double[] stickSpeeds = {powerCurve(leftRaw), powerCurve(rightRaw)};
-        double correction = 0;
 
 
         if (!Drivetrain.getInstance().getIsAntiTipDisabled()) {
             updatePitchStatus();
             if (Math.abs(pitchDegrees) > RobotMap.DRIVE.PITCH_THRESHOLD_DEGREES) {
-                //this.correctForPitch(stickSpeeds);
-                correction = this.m_pidController.calculate(pitchDegrees, this.m_timer.get() - this.m_lastTime);
-                double correctionAmount = correction * RobotMap.DRIVE.PID_PITCH_CORRECTION_FACTOR;
-                stickSpeeds[0] += correctionAmount;
-                stickSpeeds[1] += correctionAmount;
+                double pidOutput = this.m_pidController.calculate(NavX.getInstance().getFusedHeading(), this.m_timer.delta());
+                stickSpeeds[0] += pidOutput;
+                stickSpeeds[1] += pidOutput;
             }
         }
 
@@ -133,8 +110,6 @@ public class DriveAntitipPD extends Command {
                 setCamera("USB");
             }
         }
-
-        this.m_lastTime = this.m_timer.get();
     }
 
     @Override
