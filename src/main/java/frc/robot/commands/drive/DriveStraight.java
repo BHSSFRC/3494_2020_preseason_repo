@@ -1,9 +1,5 @@
 package frc.robot.commands.drive;
 
-import edu.wpi.first.networktables.NetworkTable;
-import edu.wpi.first.networktables.NetworkTableInstance;
-import edu.wpi.first.wpilibj.Timer;
-import edu.wpi.first.wpilibj.command.Command;
 import frc.robot.OI;
 import frc.robot.RobotMap;
 import frc.robot.sensors.NavX;
@@ -41,15 +37,15 @@ public class DriveStraight extends Drive {
     }
 
 
-    private void updateYawStatus() {
-        this.yawDegrees = NavX.getInstance().getYawDegrees();
+    private void updateFusedHeading() {
+        this.yawDegrees = NavX.getInstance().getFusedHeading();
     }
 
 
     @Override
     protected void execute() {
         double[] stickSpeeds = {RobotMap.DRIVE.DRIVE_STRAIGHT_POWER, RobotMap.DRIVE.DRIVE_STRAIGHT_POWER};
-        this.updateYawStatus();
+        this.updateFusedHeading();
         double correctionAmount = 0;
 
         double pidOutput = this.pidController.calculate(yawDegrees, this.m_timer.get() - this.lastTime);

@@ -11,4 +11,10 @@ public class QuadTimer extends Timer {
         return delta;
     }
 
+    @Override
+    public void reset(){
+        super();
+        lastTime = 0;
+    }
+
 }
