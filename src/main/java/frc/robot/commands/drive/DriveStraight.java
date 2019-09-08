@@ -15,8 +15,6 @@ public class DriveStraight extends Drive {
      */
     private boolean sideFlipped = false;
 
-    private double fusedHeadingRadians;
-
     private SynchronousPIDF pidController;
 
     private QuadTimer m_timer;
@@ -36,18 +34,13 @@ public class DriveStraight extends Drive {
     }
 
 
-    private void updateFusedHeading() {
-        this.fusedHeadingRadians = NavX.getInstance().getFusedHeading();
-    }
-
-
     @Override
     protected void execute() {
         double[] stickSpeeds = {RobotMap.DRIVE.DRIVE_STRAIGHT_POWER, RobotMap.DRIVE.DRIVE_STRAIGHT_POWER};
         this.updateFusedHeading();
         double correctionAmount = 0;
 
-        double pidOutput = this.pidController.calculate(fusedHeadingRadians, this.m_timer.delta());
+        double pidOutput = this.pidController.calculate(NavX.getInstance().getFusedHeading(), this.m_timer.delta());
 
         stickSpeeds[0] += pidOutput;
         stickSpeeds[1] -= pidOutput;
