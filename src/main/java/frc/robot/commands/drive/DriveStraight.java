@@ -77,7 +77,6 @@ public class DriveStraight extends Command {
 
     @Override
     protected void execute() {
-        //TODO: speeds should just be some constant
         double[] stickSpeeds = {RobotMap.DRIVE.DRIVE_STRAIGHT_POWER, RobotMap.DRIVE.DRIVE_STRAIGHT_POWER};
         this.updateYawStatus();
         double correctionAmount = 0;

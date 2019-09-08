@@ -81,8 +81,7 @@ public class DriveAntitipPD extends Command {
                 stickSpeeds[0] = correctionOffset;
                 stickSpeeds[1] = correctionOffset;
             }
-            //TODO: does this actually work considering that normalize() doesn't return anything? If it does work
-            //then revert DriveStraight to return void
+            //TODO: does this actually work considering that normalize() doesn't return anything? If it does work then revert DriveStraight to return void
             normalize(stickSpeeds);
         }
     }
