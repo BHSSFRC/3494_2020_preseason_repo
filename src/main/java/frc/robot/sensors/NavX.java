@@ -30,9 +30,9 @@ public class NavX {
     }
 
     public double getFusedHeading() {
-        double fusedHeading = (ahrs.getFusedHeading() - resetValue);
+        double fusedHeading = (ahrs.getFusedHeading() * (Math.PI / 180) - resetValue);
         if (fusedHeading < 0) {
-            return 360 + fusedHeading;
+            return 2 * Math.PI + fusedHeading;
         }
         return fusedHeading;
     }

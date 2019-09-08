@@ -15,12 +15,11 @@ public class DriveStraight extends Drive {
      */
     private boolean sideFlipped = false;
 
-    private double yawDegrees;
+    private double fusedHeadingRadians;
 
     private SynchronousPIDF pidController;
 
     private QuadTimer m_timer;
-    private double lastTime;
 
     public DriveStraight() {
         requires(Drivetrain.getInstance());
@@ -29,7 +28,7 @@ public class DriveStraight extends Drive {
         pidController = new SynchronousPIDF(RobotMap.DRIVE.KP, RobotMap.DRIVE.KI, RobotMap.DRIVE.KD);
         pidController.setSetpoint(0);
 
-        pidController.setInputRange(-180, 180);
+        pidController.setInputRange(0, 2 * Math.PI);
         pidController.setContinuous(true);
         pidController.setOutputRange(-1, 1);
 
@@ -38,7 +37,7 @@ public class DriveStraight extends Drive {
 
 
     private void updateFusedHeading() {
-        this.yawDegrees = NavX.getInstance().getFusedHeading();
+        this.fusedHeadingRadians = NavX.getInstance().getFusedHeading();
     }
 
 
@@ -48,7 +47,7 @@ public class DriveStraight extends Drive {
         this.updateFusedHeading();
         double correctionAmount = 0;
 
-        double pidOutput = this.pidController.calculate(yawDegrees, this.m_timer.get() - this.lastTime);
+        double pidOutput = this.pidController.calculate(fusedHeadingRadians, this.m_timer.delta());
         correctionAmount = pidOutput * RobotMap.DRIVE.PID_YAW_CORRECTION_FACTOR;
 
         stickSpeeds[0] += correctionAmount;
@@ -72,6 +71,5 @@ public class DriveStraight extends Drive {
                 setCamera("USB");
             }
         }
-        this.lastTime = this.m_timer.get();
     }
 }

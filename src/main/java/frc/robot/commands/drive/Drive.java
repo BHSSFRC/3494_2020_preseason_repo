@@ -33,7 +33,7 @@ public class Drive extends Command {
      *                    If any of the values are more than 1, they aren't valid values for motor power.
      *                    If so, it divides all array values by the largest value to preserve the value ratios while making them valid motor power values.
      */
-    private void normalize(double[] motorSpeeds) {
+    double[] normalize(double[] motorSpeeds) {
         double max = Math.abs(motorSpeeds[0]);
         boolean normFlag = max > 1;
 
@@ -49,6 +49,7 @@ public class Drive extends Command {
                 motorSpeeds[i] /= max;
             }
         }
+        return motorSpeeds;
     }
 
     private void correctForPitch(double[] stickSpeeds) {//x-tip
@@ -65,7 +66,7 @@ public class Drive extends Command {
                 stickSpeeds[0] = correctionOffset;
                 stickSpeeds[1] = correctionOffset;
             }
-            normalize(stickSpeeds);
+            stickSpeeds = normalize(stickSpeeds);
         }
     }
 
