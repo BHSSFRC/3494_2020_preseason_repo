@@ -32,42 +32,12 @@ public class DriveAntitipPD extends Command {
 
         m_pidController = new SynchronousPIDF(RobotMap.DRIVE.KP, RobotMap.DRIVE.KI, RobotMap.DRIVE.KD);
         m_pidController.setSetpoint(0);
-        //input range isn't 0 to 360 because negative pitch angles from the gyro exist
         m_pidController.setInputRange(-180, 180);
         m_pidController.setContinuous(true);
         m_pidController.setOutputRange(-1, 1);
     }
 
-    private static double powerCurve(double x) {
-        // https://www.desmos.com/calculator/g07ukjj7bl
-        double curve = (0.5D * (Math.atan(Math.PI * (Math.abs(x) - 0.5D)))) + 0.5D;
-        return Math.copySign(curve, x);
-    }
-
-    /**
-     * @param motorSpeeds array of motor power values
-     *                    If any of the values are more than 1, they aren't valid values for motor power.
-     *                    If so, it divides all array values by the largest value to preserve the value ratios while making them valid motor power values.
-     */
-    private double[] normalize(double[] motorSpeeds) {
-        double max = Math.abs(motorSpeeds[0]);
-        boolean normFlag = max > 1;
-
-        for (int i = 1; i < motorSpeeds.length; i++) {
-            if (Math.abs(motorSpeeds[i]) > max) {
-                max = Math.abs(motorSpeeds[i]);
-                normFlag = max > 1;
-            }
-        }
-
-        if (normFlag) {
-            for (int i = 0; i < motorSpeeds.length; i++) {
-                motorSpeeds[i] /= max;
-            }
-        }
-        return motorSpeeds;
-    }
-
+    //updatePitchStatus() is technically unnecessary but looks much cleaner
     private void updatePitchStatus() {
         this.pitchDegrees = NavX.getInstance().getPitchDegrees();
     }
@@ -122,5 +92,35 @@ public class DriveAntitipPD extends Command {
     private static boolean setCamera(String camera) {
         NetworkTable engineering = NetworkTableInstance.getDefault().getTable("engineering");
         return engineering.getEntry("camera").setString(camera);
+    }
+
+    /**
+     * @param motorSpeeds array of motor power values
+     *                    If any of the values are more than 1, they aren't valid values for motor power.
+     *                    If so, it divides all array values by the largest value to preserve the value ratios while making them valid motor power values.
+     */
+    private double[] normalize(double[] motorSpeeds) {
+        double max = Math.abs(motorSpeeds[0]);
+        boolean normFlag = max > 1;
+
+        for (int i = 1; i < motorSpeeds.length; i++) {
+            if (Math.abs(motorSpeeds[i]) > max) {
+                max = Math.abs(motorSpeeds[i]);
+                normFlag = max > 1;
+            }
+        }
+
+        if (normFlag) {
+            for (int i = 0; i < motorSpeeds.length; i++) {
+                motorSpeeds[i] /= max;
+            }
+        }
+        return motorSpeeds;
+    }
+
+    private static double powerCurve(double x) {
+        // https://www.desmos.com/calculator/g07ukjj7bl
+        double curve = (0.5D * (Math.atan(Math.PI * (Math.abs(x) - 0.5D)))) + 0.5D;
+        return Math.copySign(curve, x);
     }
 }
