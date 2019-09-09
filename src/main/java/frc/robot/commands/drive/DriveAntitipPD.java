@@ -61,7 +61,7 @@ public class DriveAntitipPD extends Command {
                 double pidOutput = this.m_pidController.calculate(NavX.getInstance().getFusedHeading(), this.m_timer.delta());
                 stickSpeeds[0] += pidOutput;
                 stickSpeeds[1] += pidOutput;
-                stickSpeeds = normalize(stickSpeeds);
+                //stickSpeeds = normalize(stickSpeeds);
             }
         }
 
@@ -99,7 +99,7 @@ public class DriveAntitipPD extends Command {
      *                    If any of the values are more than 1, they aren't valid values for motor power.
      *                    If so, it divides all array values by the largest value to preserve the value ratios while making them valid motor power values.
      */
-    private double[] normalize(double[] motorSpeeds) {
+    /**private double[] normalize(double[] motorSpeeds) {
         double max = Math.abs(motorSpeeds[0]);
         boolean normFlag = max > 1;
 
@@ -116,7 +116,7 @@ public class DriveAntitipPD extends Command {
             }
         }
         return motorSpeeds;
-    }
+    }*/
 
     private static double powerCurve(double x) {
         // https://www.desmos.com/calculator/g07ukjj7bl

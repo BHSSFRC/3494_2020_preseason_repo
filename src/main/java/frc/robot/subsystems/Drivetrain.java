@@ -116,8 +116,33 @@ public class Drivetrain extends PIDSubsystem {
      * @param rightSpeed Speed of right side.
      */
     public void tankDrive(double leftSpeed, double rightSpeed) {
-        this.driveLeftMaster.set(leftSpeed);
-        this.driveRightMaster.set(rightSpeed);
+        double[] motorSpeeds = this.normalize(new double[]{leftSpeed, rightSpeed});
+        this.driveLeftMaster.set(motorSpeeds[0]);
+        this.driveRightMaster.set(motorSpeeds[1]);
+    }
+
+    /**
+     * @param motorSpeeds array of motor power values
+     *                    If any of the values are more than 1, they aren't valid values for motor power.
+     *                    If so, it divides all array values by the largest value to preserve the value ratios while making them valid motor power values.
+     */
+    private double[] normalize(double[] motorSpeeds) {
+        double max = Math.abs(motorSpeeds[0]);
+        boolean normFlag = max > 1;
+
+        for (int i = 1; i < motorSpeeds.length; i++) {
+            if (Math.abs(motorSpeeds[i]) > max) {
+                max = Math.abs(motorSpeeds[i]);
+                normFlag = max > 1;
+            }
+        }
+
+        if (normFlag) {
+            for (int i = 0; i < motorSpeeds.length; i++) {
+                motorSpeeds[i] /= max;
+            }
+        }
+        return motorSpeeds;
     }
 
     //returns feet per sec velocity

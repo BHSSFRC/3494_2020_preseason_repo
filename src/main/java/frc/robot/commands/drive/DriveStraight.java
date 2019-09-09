@@ -68,4 +68,9 @@ public class DriveStraight extends Command {
             }
         }
     }
+
+    @Override
+    protected boolean isFinished() {
+        return false;
+    }
 }
