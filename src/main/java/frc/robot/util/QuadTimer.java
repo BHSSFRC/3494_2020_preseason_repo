@@ -13,7 +13,7 @@ public class QuadTimer extends Timer {
 
     @Override
     public void reset(){
-        super();
+        super.reset();
         lastTime = 0;
     }
 

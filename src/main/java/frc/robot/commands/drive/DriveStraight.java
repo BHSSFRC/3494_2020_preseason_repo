@@ -50,7 +50,7 @@ public class DriveStraight extends Command {
 
         stickSpeeds[0] += pidOutput;
         stickSpeeds[1] -= pidOutput;
-        
+
         if (!sideFlipped) {
             Drivetrain.getInstance().tankDrive(stickSpeeds[0], stickSpeeds[1]);
         } else {
