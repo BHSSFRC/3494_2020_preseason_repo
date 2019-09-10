@@ -25,6 +25,7 @@ public class Drive extends Command {
     private static double powerCurve(double x) {
         // https://www.desmos.com/calculator/g07ukjj7bl
         double curve = (0.5D * (Math.atan(Math.PI * (Math.abs(x) - 0.5D)))) + 0.5D;
+        //double curve = Math.pow(Math.sin(Math.PI/2*Math.abs(x)),RobotMap.DRIVE.POWER_CURVE_EXPONENT) * Math.signum(x);
         return Math.copySign(curve, x);
     }
 

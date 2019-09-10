@@ -53,6 +53,8 @@ public class RobotMap {
         public static final double KD = 0;
 
         public static final double DRIVE_STRAIGHT_POWER = .3;
+
+        public static final double POWER_CURVE_EXPONENT = 1.8;
     }
 
     public class CLIMBER {
